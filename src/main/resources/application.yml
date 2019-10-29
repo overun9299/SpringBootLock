@@ -1,5 +1,5 @@
 server:
-  port: 9297
+  port: 9881
   servlet:
     context-path: /lock
 redis:
@@ -19,3 +19,12 @@ redis:
     # 从连接池中获取连接最大等待时间（默认为-1，单位为毫秒，负数表示无限）
     max-wait: -1
 
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/lock?useUnicode=true&characterEncoding=utf8&allowMultiQueries=true
+    username: root
+    password: root
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
