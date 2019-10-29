@@ -1,5 +1,7 @@
 package soap.service.impl;
 
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +25,9 @@ import java.util.UUID;
  */
 @Service
 public class BuyServiceImpl implements BuyService {
+
+    @Autowired
+    private RedissonClient redissonClient;
 
     @Autowired
     private OrderMapper orderMapper;
@@ -108,9 +113,41 @@ public class BuyServiceImpl implements BuyService {
         }
     }
 
+    /**
+     * 使用Redis锁
+     * @return
+     */
     @Override
     public String BuyRedis() {
-
-        return null;
+        String key = "key_product";
+        RLock lock = redissonClient.getLock(key);
+        try {
+            lock.lock();
+            /** 先判断是否有库存 */
+            Product product = productMapper.selectByPrimaryKey(1);
+            if (product.getNumber() <= 0) {
+                System.out.println("库存不足！");
+                return "库存不足！";
+            } else {
+                /** 减库存 */
+                int i =productMapper.reduceOrder();
+                if (i == 1) {
+                    /** 生成订单 */
+                    Order order = new Order();
+                    order.setOrderId(UUID.randomUUID().toString());
+                    orderMapper.insertSelective(order);
+                    System.out.println("购买成功！");
+                    return "购买成功！";
+                } else {
+                    System.out.println("购买失败！");
+                    return "购买失败！";
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            lock.unlock();
+        }
+        return "";
     }
 }
