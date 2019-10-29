@@ -22,4 +22,16 @@ public interface BuyService {
      * @return
      */
     String BuyOptimistic();
+
+    /**
+     * 使用悲观锁
+     * @return
+     */
+    String BuyPessimism();
+
+    /**
+     * 使用分布式锁
+     * @return
+     */
+    String BuyRedis();
 }

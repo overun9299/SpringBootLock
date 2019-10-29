@@ -100,11 +100,18 @@ public interface ProductMapper {
     /**
      * 减库存操作
      */
-    void reduceOrder();
+    int reduceOrder();
 
     /**
      * 减库存操作-乐观锁
      * @param ver
      */
     int reduceOrderOptimistic(@Param(value = "ver") int ver);
+
+    /**
+     * 悲观锁查询
+     * @param i
+     * @return
+     */
+    Product selectWithPessimism(@Param(value = "id") int i);
 }

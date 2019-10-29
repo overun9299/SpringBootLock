@@ -2,6 +2,7 @@ package soap.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import soap.mapper.OrderMapper;
 import soap.mapper.ProductMapper;
 import soap.service.BuyService;
@@ -41,13 +42,18 @@ public class BuyServiceImpl implements BuyService {
             return "库存不足！";
         } else {
             /** 减库存 */
-            productMapper.reduceOrder();
-            /** 生成订单 */
-            Order order = new Order();
-            order.setOrderId(UUID.randomUUID().toString());
-            orderMapper.insertSelective(order);
-            System.out.println("购买成功！");
-            return "购买成功！";
+            int i =productMapper.reduceOrder();
+            if (i == 1) {
+                /** 生成订单 */
+                Order order = new Order();
+                order.setOrderId(UUID.randomUUID().toString());
+                orderMapper.insertSelective(order);
+                System.out.println("购买成功！");
+                return "购买成功！";
+            } else {
+                System.out.println("购买失败！");
+                return "购买失败！";
+            }
         }
     }
 
@@ -73,5 +79,38 @@ public class BuyServiceImpl implements BuyService {
                 return "购买失败！";
             }
         }
+    }
+
+    @Transactional
+    @Override
+    public String BuyPessimism() {
+
+        /** 先判断是否有库存 */
+//        Product product = productMapper.selectByPrimaryKey(1);
+        Product product = productMapper.selectWithPessimism(1);
+        if (product.getNumber() <= 0) {
+            System.out.println("库存不足！");
+            return "库存不足！";
+        } else {
+            /** 减库存 */
+            int i =productMapper.reduceOrder();
+            if (i == 1) {
+                /** 生成订单 */
+                Order order = new Order();
+                order.setOrderId(UUID.randomUUID().toString());
+                orderMapper.insertSelective(order);
+                System.out.println("购买成功！");
+                return "购买成功！";
+            } else {
+                System.out.println("购买失败！");
+                return "购买失败！";
+            }
+        }
+    }
+
+    @Override
+    public String BuyRedis() {
+
+        return null;
     }
 }

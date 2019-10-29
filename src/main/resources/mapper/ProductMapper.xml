@@ -279,4 +279,8 @@
       SET number = number - 1 , version = version + 1 where version = #{ver,jdbcType=INTEGER}
   </update>
 
+  <select id="selectWithPessimism" resultType="soap.vo.Product">
+    SELECT * FROM product WHERE id = #{id , jdbcType=INTEGER} for update
+  </select>
+
 </mapper>

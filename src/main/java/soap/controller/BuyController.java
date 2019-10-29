@@ -31,7 +31,7 @@ public class BuyController {
 
     /**
      * 购买操作 - 2
-     * 使用synchronized关键字，线程安全，但是性能低下 （请求时间2s数据正常）
+     * 使用synchronized关键字(也属于悲观锁)，线程安全，但是性能低下 （请求时间2s数据正常）
      * */
     @RequestMapping(value = "buySyn")
     public synchronized String BuySyn() {
@@ -45,6 +45,24 @@ public class BuyController {
     @RequestMapping(value = "buyOptimistic")
     public String BuyOptimistic() {
         return buyService.BuyOptimistic();
+    }
+
+    /**
+     * 购买操作 - 4
+     * 使用悲观锁，select for update ,但是不起作用。
+     * */
+    @RequestMapping(value = "buyPessimism")
+    public String BuyPessimism() {
+        return buyService.BuyPessimism();
+    }
+
+    /**
+     * 使用Redis分布式锁
+     * @return
+     */
+    @RequestMapping(value = "buyRedis")
+    public String BuyRedis() {
+        return buyService.BuyRedis();
     }
 
 
